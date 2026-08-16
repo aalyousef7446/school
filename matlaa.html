@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>مَطلع | منصة متابعة الحضور الصباحي</title>
+<style>
+:root{--ink:#173b3f;--muted:#718487;--line:#e7eeee;--bg:#f7faf9;--card:#fff;--gold:#b99a55;--green:#2f8f72;--yellow:#c89b35;--red:#c45b61;--blue:#527aa3}
+*{box-sizing:border-box}body{margin:0;font-family:Tahoma,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+header{background:linear-gradient(135deg,#e9f3ef,#f8f5ed);border-bottom:1px solid var(--line);padding:22px 6%}
+.top{display:flex;justify-content:space-between;align-items:center;gap:20px;max-width:1250px;margin:auto}.brand{display:flex;align-items:center;gap:14px}.mark{width:54px;height:54px;border-radius:17px;background:var(--ink);color:#fff;display:grid;place-items:center;font-size:24px}.brand h1{margin:0;font-size:25px}.brand p{margin:4px 0 0;color:var(--muted);font-size:13px}
+.date{background:#fff;border:1px solid var(--line);padding:11px 15px;border-radius:12px;font-size:14px}
+main{max-width:1250px;margin:28px auto;padding:0 20px}.hero{display:flex;justify-content:space-between;align-items:end;margin-bottom:22px}.hero h2{margin:0 0 7px;font-size:24px}.hero p{margin:0;color:var(--muted)}
+.actions{display:flex;gap:10px;flex-wrap:wrap}.btn{border:0;border-radius:12px;padding:12px 16px;font-weight:700;cursor:pointer;background:var(--ink);color:#fff}.btn.alt{background:#fff;color:var(--ink);border:1px solid var(--line)}
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:13px;margin:20px 0}.stat{background:var(--card);border:1px solid var(--line);border-radius:17px;padding:18px;box-shadow:0 4px 18px #173b3f08}.stat small{color:var(--muted)}.stat strong{display:block;font-size:27px;margin-top:8px}.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-left:6px}.g{background:var(--green)}.y{background:var(--yellow)}.r{background:var(--red)}.b{background:var(--blue)}
+.panel{background:#fff;border:1px solid var(--line);border-radius:20px;padding:20px;box-shadow:0 4px 18px #173b3f08}.panelhead{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:15px}.search{width:280px;max-width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:12px;font-family:inherit}
+table{width:100%;border-collapse:collapse}th,td{text-align:right;padding:14px 10px;border-bottom:1px solid #eef2f1;font-size:14px}th{color:var(--muted);font-weight:600}.name{font-weight:700}.status{display:flex;gap:6px;flex-wrap:wrap}.sbtn{border:1px solid var(--line);background:#fff;border-radius:10px;padding:8px 10px;cursor:pointer;font-family:inherit;font-size:12px}.sbtn.active.g{background:#e6f4ef;color:#226e58}.sbtn.active.y{background:#fbf3df;color:#8c6819}.sbtn.active.r{background:#fae9ea;color:#9b3d45}.sbtn.active.b{background:#eaf0f7;color:#3d6188}
+.empty{padding:45px;text-align:center;color:var(--muted)}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:28px}
+@media(max-width:900px){.stats{grid-template-columns:repeat(2,1fr)}.top,.hero{align-items:flex-start;flex-direction:column}.date{width:100%}table{min-width:760px}.panel{overflow:auto}}
+</style>
+</head>
+<body>
+<header><div class="top">
+<div class="brand"><div class="mark">م</div><div><h1>مَطلع</h1><p>منصة متابعة الحضور الصباحي</p></div></div>
+<div class="date" id="today"></div>
+</div></header>
+
+<main>
+<section class="hero">
+<div><h2>متابعة اليوم</h2><p>نبدأ يومنا بحضور… ونصنع أثرًا 🌱</p></div>
+<div class="actions">
+<button class="btn" onclick="document.getElementById('file').click()">+ رفع قائمة الموظفات</button>
+<button class="btn alt" onclick="exportCSV()">تصدير تقرير Excel</button>
+<input id="file" type="file" accept=".csv,.xlsx,.xls" hidden onchange="importCSV(event)">
+</div>
+</section>
+
+<section class="stats">
+<div class="stat"><small>الإجمالي</small><strong id="total">0</strong></div>
+<div class="stat"><small><span class="dot g"></span>حضرت</small><strong id="present">0</strong></div>
+<div class="stat"><small><span class="dot y"></span>لم تحضر</small><strong id="notattend">0</strong></div>
+<div class="stat"><small><span class="dot r"></span>غائبة</small><strong id="absent">0</strong></div>
+<div class="stat"><small><span class="dot b"></span>مكلفة</small><strong id="assigned">0</strong></div>
+</section>
+
+
+<section class="panel" style="margin-bottom:16px">
+<div class="panelhead"><h3>إدارة الموظفات</h3></div>
+<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+<input class="search" id="newName" placeholder="اكتبي اسم الموظفة الجديدة..." style="width:340px">
+<button class="btn" onclick="addStaff()">+ إضافة موظفة</button>
+</div>
+<p style="color:var(--muted);font-size:12px;margin:12px 0 0">يمكنك تعديل أو حذف أي موظفة من قائمة الأسماء أدناه. إضافة الأسماء يدويًا لا تحذف القائمة الحالية.</p>
+</section>
+
+<section class="panel">
+<div class="panelhead"><h3>قائمة الموظفات</h3><input class="search" id="search" placeholder="ابحثي باسم الموظفة..." oninput="render()"></div>
+<div id="table"></div>
+</section>
+</main>
+<footer>مَطلع — نموذج أولي قابل للتطوير</footer>
+
+<script>
+const key='matlaa_staff_v1', dateKey=()=>new Date().toISOString().slice(0,10);
+let staff=JSON.parse(localStorage.getItem(key)||'[]');
+const statuses=[['present','حضرت','g'],['notattend','لم تحضر','y'],['absent','غائبة','r'],['assigned','مكلفة','b']];
+document.getElementById('today').textContent=new Intl.DateTimeFormat('ar-SA',{dateStyle:'full'}).format(new Date());
+
+function save(){localStorage.setItem(key,JSON.stringify(staff))}
+function setStatus(i,s){staff[i].status=s;staff[i].date=dateKey();save();render()}
+function render(){
+ const q=document.getElementById('search').value.trim();
+ const rows=staff.map((x,i)=>({...x,i})).filter(x=>x.name.includes(q));
+ document.getElementById('total').textContent=staff.length;
+ statuses.forEach(([k])=>document.getElementById(k).textContent=staff.filter(x=>x.status===k&&x.date===dateKey()).length);
+ if(!rows.length){document.getElementById('table').innerHTML='<div class="empty">لم تتم إضافة موظفات بعد.<br>ارفعي ملف القائمة للبدء.</div>';return}
+ document.getElementById('table').innerHTML='<table><thead><tr><th>#</th><th>اسم الموظفة</th><th>الحالة</th></tr></thead><tbody>'+
+ rows.map(x=>`<tr><td>${x.i+1}</td><td class="name">${x.name}</td><td><div class="status">${
+ statuses.map(([k,label,c])=>`<button class="sbtn ${c} ${x.status===k&&x.date===dateKey()?'active':''}" onclick="setStatus(${x.i},'${k}')">${label}</button>`).join('')
+ }</div><div style="margin-top:7px;display:flex;gap:6px"><button class="sbtn" onclick="editStaff(${x.i})">✏️ تعديل</button><button class="sbtn" onclick="deleteStaff(${x.i})">🗑️ حذف</button></div></td></tr>`).join('')+'</tbody></table>';
+}
+function addStaff(){
+ const input=document.getElementById('newName'), name=input.value.trim();
+ if(!name){alert('يرجى إدخال اسم الموظفة.');return}
+ if(staff.some(x=>x.name===name)){alert('اسم الموظفة موجود بالفعل.');return}
+ staff.push({name,status:null,date:null}); save(); input.value=''; render();
+}
+function editStaff(i){
+ const name=prompt('تعديل اسم الموظفة:',staff[i].name);
+ if(name===null)return;
+ const clean=name.trim();
+ if(!clean)return alert('لا يمكن أن يكون الاسم فارغًا.');
+ if(staff.some((x,j)=>j!==i&&x.name===clean))return alert('هذا الاسم موجود بالفعل.');
+ staff[i].name=clean; save(); render();
+}
+function deleteStaff(i){
+ if(!confirm(`هل أنتِ متأكدة من حذف "${staff[i].name}"؟\nسيتم حذف سجلها من هذه النسخة.`))return;
+ staff.splice(i,1); save(); render();
+}
+function importCSV(e){
+ const f=e.target.files[0]; if(!f)return;
+ const r=new FileReader();
+ r.onload=()=>{
+   const lines=r.result.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+   const names=lines.map(x=>x.split(',')[1]||x.split(',')[0])
+     .map(x=>x.replace(/^["']|["']$/g,'').trim())
+     .filter(x=>x&&x!=='اسم الموظفة');
+   let added=0;
+   names.forEach(name=>{
+     if(!staff.some(x=>x.name===name)){staff.push({name,status:null,date:null});added++;}
+   });
+   save(); render(); e.target.value='';
+   alert(`تمت إضافة ${added} موظفة جديدة. لم يتم حذف الأسماء السابقة.`);
+ };
+ r.readAsText(f,'UTF-8');
+}
+
+function exportCSV(){
+ let csv='اسم الموظفة,الحالة,التاريخ\n';
+ staff.forEach(x=>{let label=statuses.find(s=>s[0]===x.status)?.[1]||'لم يسجل';csv+=`"${x.name}","${label}","${x.date||dateKey()}"\n`});
+ const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`مطلع-تقرير-${dateKey()}.csv`;a.click();
+}
+render();
+</script>
+</body>
+</html>
